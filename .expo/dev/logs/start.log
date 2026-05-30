@@ -180,3 +180,62 @@
 {"_e":"metro:bundling:progress","_t":1780105724487,"id":"3","progress":0.999,"total":689,"current":682}
 {"_e":"metro:bundling:progress","_t":1780105724606,"id":"3","progress":0.999,"total":691,"current":691}
 {"_e":"metro:bundling:done","_t":1780105725208,"id":"3","total":691,"ms":15146.213}
+{"_e":"root:init","_t":1780105998021,"format":"v0-jsonl","version":"56.1.13"}
+{"_e":"env:mode","_t":1780105998022,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1780105998026,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1780105998306,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1780105998730,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1780106002994,"atlas":false,"workers":6,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1780107135013,"id":"1","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1780107135014,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107135018,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107135119,"id":"1","progress":0.06925207756232686,"total":152,"current":40}
+{"_e":"metro:bundling:progress","_t":1780107135218,"id":"1","progress":0.1711101433847841,"total":249,"current":103}
+{"_e":"metro:bundling:progress","_t":1780107135318,"id":"1","progress":0.36984699442812075,"total":319,"current":194}
+{"_e":"metro:bundling:progress","_t":1780107135418,"id":"1","progress":0.47829504760241065,"total":428,"current":296}
+{"_e":"metro:bundling:progress","_t":1780107135518,"id":"1","progress":0.6622826981320354,"total":478,"current":389}
+{"_e":"metro:bundling:progress","_t":1780107135636,"id":"1","progress":0.8302000064322241,"total":529,"current":482}
+{"_e":"metro:bundling:progress","_t":1780107135736,"id":"1","progress":0.9297296042302122,"total":587,"current":566}
+{"_e":"metro:bundling:progress","_t":1780107135842,"id":"1","progress":0.9297296042302122,"total":672,"current":645}
+{"_e":"metro:bundling:progress","_t":1780107135945,"id":"1","progress":0.9971077383183833,"total":691,"current":690}
+{"_e":"metro:bundling:failed","_t":1780107136107,"id":"1","message":"SyntaxError: C:\\Users\\mcarr\\mi-app\\App.js: Unexpected token, expected \",\" (16:18)\n\n  14 |     const [kilometraje, setKilometraje] = useState('');\n  15 |     const [litro, setLitros] = useState('');\n> 16 |     const [precio setPrecio] = useState('')\n     |                   ^\n  17 |     const [tipoCarga setTipoCarga] = useState('')\n  18 |\n  19 |     const guardarRegistro =() => {","importStack":null,"filename":"App.js","targetModuleName":null,"originModulePath":null}
+{"_e":"metro:bundling:started","_t":1780107187601,"id":"2","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1780107187601,"id":"2","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107187604,"id":"2","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107187704,"id":"2","progress":0.17886547204299397,"total":253,"current":107}
+{"_e":"metro:bundling:progress","_t":1780107187804,"id":"2","progress":0.3866288625904011,"total":312,"current":194}
+{"_e":"metro:bundling:progress","_t":1780107187904,"id":"2","progress":0.511086024565119,"total":463,"current":331}
+{"_e":"metro:bundling:progress","_t":1780107188028,"id":"2","progress":0.8302000064322241,"total":529,"current":482}
+{"_e":"metro:bundling:progress","_t":1780107188127,"id":"2","progress":0.9697750521786183,"total":591,"current":582}
+{"_e":"metro:bundling:progress","_t":1780107188227,"id":"2","progress":0.9697750521786183,"total":678,"current":664}
+{"_e":"metro:bundling:failed","_t":1780107188241,"id":"2","message":"SyntaxError: C:\\Users\\mcarr\\mi-app\\App.js: Unexpected token, expected \",\" (16:18)\n\n  14 |     const [kilometraje, setKilometraje] = useState('');\n  15 |     const [litro, setLitros] = useState('');\n> 16 |     const [precio setPrecio] = useState('')\n     |                   ^\n  17 |     const [tipoCarga setTipoCarga] = useState('')\n  18 |\n  19 |     const guardarRegistro =() => {","importStack":null,"filename":"App.js","targetModuleName":null,"originModulePath":null}
+{"_e":"metro:bundling:started","_t":1780107223066,"id":"3","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1780107223066,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107223067,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107223174,"id":"3","progress":0.2887628069553324,"total":281,"current":151}
+{"_e":"metro:bundling:progress","_t":1780107223303,"id":"3","progress":0.45086233171736,"total":417,"current":280}
+{"_e":"metro:bundling:progress","_t":1780107223403,"id":"3","progress":0.8132497459849559,"total":499,"current":450}
+{"_e":"metro:bundling:progress","_t":1780107223503,"id":"3","progress":0.9259522961908152,"total":583,"current":561}
+{"_e":"metro:bundling:failed","_t":1780107223577,"id":"3","message":"SyntaxError: C:\\Users\\mcarr\\mi-app\\App.js: Unexpected token, expected \",\" (16:18)\n\n  14 |     const [kilometraje, setKilometraje] = useState('');\n  15 |     const [litro, setLitros] = useState('');\n> 16 |     const [precio setPrecio] = useState('')\n     |                   ^\n  17 |     const [tipoCarga setTipoCarga] = useState('')\n  18 |\n  19 |     const guardarRegistro =() => {","importStack":null,"filename":"App.js","targetModuleName":null,"originModulePath":null}
+{"_e":"metro:bundling:started","_t":1780107254801,"id":"4","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1780107254801,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107254803,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780107254903,"id":"4","progress":0.1133557233403197,"total":199,"current":67}
+{"_e":"metro:bundling:progress","_t":1780107255005,"id":"4","progress":0.2887628069553324,"total":281,"current":151}
+{"_e":"metro:bundling:progress","_t":1780107255105,"id":"4","progress":0.40121641034570676,"total":401,"current":254}
+{"_e":"metro:bundling:progress","_t":1780107255205,"id":"4","progress":0.614877059519882,"total":454,"current":356}
+{"_e":"metro:bundling:progress","_t":1780107255305,"id":"4","progress":0.807815240374371,"total":494,"current":444}
+{"_e":"metro:bundling:progress","_t":1780107255405,"id":"4","progress":0.850312475526666,"total":565,"current":521}
+{"_e":"metro:bundling:progress","_t":1780107255505,"id":"4","progress":0.9474545709183851,"total":676,"current":658}
+{"_e":"metro:bundling:done","_t":1780107255616,"id":"4","total":676,"ms":814.8689}
+{"_e":"metro:client_log","_t":1780107270382,"level":"error","data":["[Error: Incompatible React versions: The \"react\" and \"react-native-renderer\" packages must have the exact same version. Instead got:\n  - react:                  19.2.6\n  - react-native-renderer:  19.2.3\nLearn more: https://react.dev/warnings/version-mismatch]"]}
+{"_e":"metro:client_log","_t":1780107270427,"level":"error","data":["[TypeError: Cannot read property 'default' of undefined]"]}
+{"_e":"root:init","_t":1780107497420,"format":"v0-jsonl","version":"56.1.13"}
+{"_e":"env:mode","_t":1780107497421,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1780107497426,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1780107497690,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1780107498096,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1780107502193,"atlas":false,"workers":6,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1780107625448,"id":"7","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1780107625453,"id":"7","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1780107625507,"id":"7","total":1,"ms":53.8333}
