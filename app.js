@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ScrollView,
 } from 'react-native';
 
 export default function App() {
@@ -16,16 +17,76 @@ export default function App() {
   const [precio, setPrecio] = useState('');
   const [tipoCarga, setTipoCarga] = useState('');
 
+  const [registros, setRegistros] = useState([]);
+
   const guardarRegistro = () => {
 	if (!kilometraje || !litros || !precio || !tipoCarga) {
   	Alert.alert('Faltan datos', 'Completa todos los campos antes de guardar.');
   	return;
 	}
 
-	Alert.alert(
-  	'Registro guardado',
-  	`Kilometraje: ${kilometraje} km\nLitros: ${litros} L\nPrecio: $${precio}\nTipo: ${tipoCarga}`
-	);
+	const kmNumero = Number(kilometraje);
+	const litrosNumero = Number(litros);
+	const precioNumero = Number(precio);
+
+	if (isNaN(kmNumero) || isNaN(litrosNumero) || isNaN(precioNumero)) {
+  	Alert.alert('Datos inválidos', 'Kilometraje, litros y precio deben ser números.');
+  	return;
+	}
+
+	if (kmNumero <= 0 || litrosNumero <= 0 || precioNumero <= 0) {
+  	Alert.alert('Datos inválidos', 'Los valores deben ser mayores a cero.');
+  	return;
+	}
+
+	const ultimoRegistro = registros[0];
+
+	let consumoCalculado = null;
+	let mensajeCalculo = 'No se calcula consumo para este registro.';
+
+	if (
+  	ultimoRegistro &&
+  	ultimoRegistro.tipoCarga === 'Carga completa' &&
+  	tipoCarga === 'Carga completa'
+	) {
+  	const kmRecorridos = kmNumero - ultimoRegistro.kilometraje;
+
+  	if (kmRecorridos > 0) {
+    	consumoCalculado = kmRecorridos / litrosNumero;
+    	mensajeCalculo = `Consumo calculado: ${consumoCalculado.toFixed(2)} km/L`;
+  	} else {
+    	mensajeCalculo = 'No se pudo calcular: el kilometraje debe ser mayor al registro anterior.';
+  	}
+	}
+
+	if (
+  	ultimoRegistro &&
+  	ultimoRegistro.tipoCarga !== 'Carga completa' &&
+  	tipoCarga === 'Carga completa'
+	) {
+  	mensajeCalculo =
+    	'No se calculó consumo porque la carga anterior no fue completa.';
+	}
+
+	if (tipoCarga === 'Carga parcial') {
+  	mensajeCalculo =
+    	'Carga parcial registrada. No se calcula consumo en cargas parciales.';
+	}
+
+	const nuevoRegistro = {
+  	id: Date.now().toString(),
+  	fecha: new Date().toLocaleDateString(),
+  	kilometraje: kmNumero,
+  	litros: litrosNumero,
+  	precio: precioNumero,
+  	tipoCarga,
+  	consumo: consumoCalculado,
+  	mensaje: mensajeCalculo,
+	};
+
+	setRegistros([nuevoRegistro, ...registros]);
+
+	Alert.alert('Registro guardado', mensajeCalculo);
 
 	setKilometraje('');
 	setLitros('');
@@ -36,7 +97,7 @@ export default function App() {
 
   if (pantalla === 'formulario') {
 	return (
-  	<View style={styles.container}>
+  	<ScrollView contentContainerStyle={styles.container}>
     	<Text style={styles.title}>Registrar combustible</Text>
     	<Text style={styles.subtitle}>Ingresa los datos de la carga</Text>
 
@@ -100,6 +161,12 @@ export default function App() {
       	</Text>
     	</TouchableOpacity>
 
+    	<View style={styles.infoBox}>
+      	<Text style={styles.infoText}>
+        	El consumo solo se calcula si la carga anterior y la carga actual son completas consecutivas.
+      	</Text>
+    	</View>
+
     	<TouchableOpacity style={styles.button} onPress={guardarRegistro}>
       	<Text style={styles.buttonText}>Guardar registro</Text>
     	</TouchableOpacity>
@@ -110,12 +177,12 @@ export default function App() {
     	>
       	<Text style={styles.backButtonText}>Volver</Text>
     	</TouchableOpacity>
-  	</View>
+  	</ScrollView>
 	);
   }
 
   return (
-	<View style={styles.container}>
+	<ScrollView contentContainerStyle={styles.container}>
   	<Text style={styles.title}>Mi Auto</Text>
   	<Text style={styles.subtitle}>Control de mantenimiento y combustible</Text>
 
@@ -137,13 +204,42 @@ export default function App() {
   	>
     	<Text style={styles.buttonText}>Agregar registro</Text>
   	</TouchableOpacity>
-	</View>
+
+  	<View style={styles.historyContainer}>
+    	<Text style={styles.historyTitle}>Historial de combustible</Text>
+
+    	{registros.length === 0 ? (
+      	<Text style={styles.emptyText}>Aún no hay registros.</Text>
+    	) : (
+      	registros.map((registro) => (
+        	<View key={registro.id} style={styles.historyCard}>
+          	<Text style={styles.historyMain}>
+            	{registro.tipoCarga === 'Carga completa' ? '🟢' : '🟡'} {registro.tipoCarga}
+          	</Text>
+
+          	<Text style={styles.historyText}>Fecha: {registro.fecha}</Text>
+          	<Text style={styles.historyText}>Kilometraje: {registro.kilometraje} km</Text>
+          	<Text style={styles.historyText}>Litros: {registro.litros} L</Text>
+          	<Text style={styles.historyText}>Precio: ${registro.precio}</Text>
+
+          	{registro.consumo ? (
+            	<Text style={styles.consumoText}>
+              	Consumo: {registro.consumo.toFixed(2)} km/L
+            	</Text>
+          	) : (
+            	<Text style={styles.noConsumoText}>{registro.mensaje}</Text>
+          	)}
+        	</View>
+      	))
+    	)}
+  	</View>
+	</ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-	flex: 1,
+	flexGrow: 1,
 	padding: 24,
 	backgroundColor: '#f3f4f6',
 	justifyContent: 'center',
@@ -240,5 +336,61 @@ const styles = StyleSheet.create({
   },
   optionTextSelected: {
 	color: '#ffffff',
+  },
+  infoBox: {
+	backgroundColor: '#dbeafe',
+	padding: 14,
+	borderRadius: 12,
+	marginTop: 8,
+	marginBottom: 8,
+  },
+  infoText: {
+	color: '#1e3a8a',
+	fontSize: 14,
+	textAlign: 'center',
+  },
+  historyContainer: {
+	marginTop: 24,
+  },
+  historyTitle: {
+	fontSize: 22,
+	fontWeight: 'bold',
+	color: '#111827',
+	marginBottom: 12,
+  },
+  emptyText: {
+	fontSize: 16,
+	color: '#6b7280',
+	textAlign: 'center',
+	marginTop: 10,
+  },
+  historyCard: {
+	backgroundColor: '#ffffff',
+	padding: 16,
+	borderRadius: 14,
+	marginBottom: 12,
+	elevation: 2,
+  },
+  historyMain: {
+	fontSize: 17,
+	fontWeight: 'bold',
+	color: '#111827',
+	marginBottom: 8,
+  },
+  historyText: {
+	fontSize: 15,
+	color: '#374151',
+	marginBottom: 4,
+  },
+  consumoText: {
+	fontSize: 16,
+	fontWeight: 'bold',
+	color: '#16a34a',
+	marginTop: 8,
+  },
+  noConsumoText: {
+	fontSize: 14,
+	color: '#92400e',
+	marginTop: 8,
   },
 });
