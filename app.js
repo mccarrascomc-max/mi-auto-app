@@ -10,7 +10,13 @@ import {
 } from 'react-native';
 
 export default function App() {
-  const [pantalla, setPantalla] = useState('inicio');
+  const [pantalla, setPantalla] = useState('login');
+
+  const [usuarios, setUsuarios] = useState([]);
+  const [usuarioActual, setUsuarioActual] = useState(null);
+
+  const [usuario, setUsuario] = useState('');
+  const [contrasena, setContrasena] = useState('');
 
   const [kilometraje, setKilometraje] = useState('');
   const [litros, setLitros] = useState('');
@@ -19,9 +25,62 @@ export default function App() {
 
   const [registros, setRegistros] = useState([]);
 
+  const crearCuenta = () => {
+	if (!usuario || !contrasena) {
+  	Alert.alert('Faltan datos', 'Ingresa usuario y contraseña.');
+  	return;
+	}
+
+	const existeUsuario = usuarios.find((u) => u.usuario === usuario);
+
+	if (existeUsuario) {
+  	Alert.alert('Usuario existente', 'Ese usuario ya existe.');
+  	return;
+	}
+
+	const nuevoUsuario = {
+  	usuario,
+  	contrasena,
+	};
+
+	setUsuarios([...usuarios, nuevoUsuario]);
+	setUsuarioActual(usuario);
+	setUsuario('');
+	setContrasena('');
+	setPantalla('inicio');
+
+	Alert.alert('Cuenta creada', 'Cuenta creada correctamente.');
+  };
+
+  const iniciarSesion = () => {
+	if (!usuario || !contrasena) {
+  	Alert.alert('Faltan datos', 'Ingresa usuario y contraseña.');
+  	return;
+	}
+
+	const usuarioEncontrado = usuarios.find(
+  	(u) => u.usuario === usuario && u.contrasena === contrasena
+	);
+
+	if (!usuarioEncontrado) {
+  	Alert.alert('Error', 'Usuario o contraseña incorrectos.');
+  	return;
+	}
+
+	setUsuarioActual(usuario);
+	setUsuario('');
+	setContrasena('');
+	setPantalla('inicio');
+  };
+
+  const cerrarSesion = () => {
+	setUsuarioActual(null);
+	setPantalla('login');
+  };
+
   const guardarRegistro = () => {
 	if (!kilometraje || !litros || !precio || !tipoCarga) {
-  	Alert.alert('Faltan datos', 'Completa todos los campos antes de guardar.');
+  	Alert.alert('Faltan datos', 'Completa todos los campos.');
   	return;
 	}
 
@@ -55,7 +114,8 @@ export default function App() {
     	consumoCalculado = kmRecorridos / litrosNumero;
     	mensajeCalculo = `Consumo calculado: ${consumoCalculado.toFixed(2)} km/L`;
   	} else {
-    	mensajeCalculo = 'No se pudo calcular: el kilometraje debe ser mayor al registro anterior.';
+    	mensajeCalculo =
+      	'No se pudo calcular: el kilometraje debe ser mayor al registro anterior.';
   	}
 	}
 
@@ -75,6 +135,7 @@ export default function App() {
 
 	const nuevoRegistro = {
   	id: Date.now().toString(),
+  	usuario: usuarioActual,
   	fecha: new Date().toLocaleDateString(),
   	kilometraje: kmNumero,
   	litros: litrosNumero,
@@ -86,20 +147,59 @@ export default function App() {
 
 	setRegistros([nuevoRegistro, ...registros]);
 
-	Alert.alert('Registro guardado', mensajeCalculo);
-
 	setKilometraje('');
 	setLitros('');
 	setPrecio('');
 	setTipoCarga('');
 	setPantalla('inicio');
+
+	Alert.alert('Registro guardado', mensajeCalculo);
   };
+
+  if (pantalla === 'login') {
+	return (
+  	<View style={styles.container}>
+    	<Text style={styles.title}>Mi Auto</Text>
+    	<Text style={styles.subtitle}>Inicia sesión o crea una cuenta</Text>
+
+    	<TextInput
+      	style={styles.input}
+      	placeholder="Usuario"
+      	value={usuario}
+      	onChangeText={setUsuario}
+      	autoCapitalize="none"
+    	/>
+
+    	<TextInput
+      	style={styles.input}
+      	placeholder="Contraseña"
+      	value={contrasena}
+      	onChangeText={setContrasena}
+      	secureTextEntry
+    	/>
+
+    	<TouchableOpacity style={styles.button} onPress={iniciarSesion}>
+      	<Text style={styles.buttonText}>Iniciar sesión</Text>
+    	</TouchableOpacity>
+
+    	<TouchableOpacity style={styles.secondaryButton} onPress={crearCuenta}>
+      	<Text style={styles.secondaryButtonText}>Crear cuenta</Text>
+    	</TouchableOpacity>
+
+    	<View style={styles.infoBox}>
+      	<Text style={styles.infoText}>
+        	Versión de prueba: los usuarios y registros se mantienen mientras la app esté abierta.
+      	</Text>
+    	</View>
+  	</View>
+	);
+  }
 
   if (pantalla === 'formulario') {
 	return (
   	<ScrollView contentContainerStyle={styles.container}>
     	<Text style={styles.title}>Registrar combustible</Text>
-    	<Text style={styles.subtitle}>Ingresa los datos de la carga</Text>
+    	<Text style={styles.subtitle}>Usuario: {usuarioActual}</Text>
 
     	<TextInput
       	style={styles.input}
@@ -163,7 +263,7 @@ export default function App() {
 
     	<View style={styles.infoBox}>
       	<Text style={styles.infoText}>
-        	El consumo solo se calcula si la carga anterior y la carga actual son completas consecutivas.
+        	El consumo solo se calcula si la carga anterior y la actual son completas consecutivas.
       	</Text>
     	</View>
 
@@ -185,6 +285,14 @@ export default function App() {
 	<ScrollView contentContainerStyle={styles.container}>
   	<Text style={styles.title}>Mi Auto</Text>
   	<Text style={styles.subtitle}>Control de mantenimiento y combustible</Text>
+
+  	<View style={styles.userBox}>
+    	<Text style={styles.userText}>Usuario: {usuarioActual}</Text>
+
+    	<TouchableOpacity onPress={cerrarSesion}>
+      	<Text style={styles.logoutText}>Cerrar sesión</Text>
+    	</TouchableOpacity>
+  	</View>
 
   	<View style={styles.card}>
     	<Text style={styles.cardTitle}>Próximas mantenciones</Text>
@@ -218,7 +326,9 @@ export default function App() {
           	</Text>
 
           	<Text style={styles.historyText}>Fecha: {registro.fecha}</Text>
-          	<Text style={styles.historyText}>Kilometraje: {registro.kilometraje} km</Text>
+          	<Text style={styles.historyText}>
+            	Kilometraje: {registro.kilometraje} km
+          	</Text>
           	<Text style={styles.historyText}>Litros: {registro.litros} L</Text>
           	<Text style={styles.historyText}>Precio: ${registro.precio}</Text>
 
@@ -256,6 +366,25 @@ const styles = StyleSheet.create({
 	textAlign: 'center',
 	color: '#6b7280',
 	marginBottom: 30,
+  },
+  userBox: {
+	backgroundColor: '#ffffff',
+	padding: 14,
+	borderRadius: 12,
+	marginBottom: 16,
+	elevation: 2,
+  },
+  userText: {
+	fontSize: 15,
+	color: '#111827',
+	fontWeight: 'bold',
+	textAlign: 'center',
+	marginBottom: 8,
+  },
+  logoutText: {
+	color: '#dc2626',
+	fontWeight: 'bold',
+	textAlign: 'center',
   },
   sectionTitle: {
 	fontSize: 18,
@@ -303,6 +432,20 @@ const styles = StyleSheet.create({
 	fontWeight: 'bold',
 	textAlign: 'center',
   },
+  secondaryButton: {
+	backgroundColor: '#ffffff',
+	padding: 16,
+	borderRadius: 14,
+	marginTop: 12,
+	borderWidth: 1,
+	borderColor: '#2563eb',
+  },
+  secondaryButtonText: {
+	color: '#2563eb',
+	fontSize: 16,
+	fontWeight: 'bold',
+	textAlign: 'center',
+  },
   backButton: {
 	padding: 16,
 	marginTop: 12,
@@ -341,7 +484,7 @@ const styles = StyleSheet.create({
 	backgroundColor: '#dbeafe',
 	padding: 14,
 	borderRadius: 12,
-	marginTop: 8,
+	marginTop: 12,
 	marginBottom: 8,
   },
   infoText: {
