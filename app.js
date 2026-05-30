@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -8,13 +8,12 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [pantalla, setPantalla] = useState('login');
 
-  const [usuarios, setUsuarios] = useState([]);
   const [usuarioActual, setUsuarioActual] = useState(null);
-
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
 
@@ -25,60 +24,159 @@ export default function App() {
 
   const [registros, setRegistros] = useState([]);
 
-  const crearCuenta = () => {
+  useEffect(() => {
+	cargarSesion();
+  }, []);
+
+  useEffect(() => {
+	if (usuarioActual) {
+  	cargarRegistros(usuarioActual);
+	}
+  }, [usuarioActual]);
+
+  const cargarSesion = async () => {
+	try {
+  	const sesionGuardada = await AsyncStorage.getItem('usuarioActual');
+
+  	if (sesionGuardada) {
+    	setUsuarioActual(sesionGuardada);
+    	setPantalla('inicio');
+  	}
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudo cargar la sesión.');
+	}
+  };
+
+  const obtenerUsuarios = async () => {
+	try {
+  	const usuariosGuardados = await AsyncStorage.getItem('usuarios');
+  	return usuariosGuardados ? JSON.parse(usuariosGuardados) : [];
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudieron obtener los usuarios.');
+  	return [];
+	}
+  };
+
+  const guardarUsuarios = async (listaUsuarios) => {
+	try {
+  	await AsyncStorage.setItem('usuarios', JSON.stringify(listaUsuarios));
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudieron guardar los usuarios.');
+	}
+  };
+
+  const crearCuenta = async () => {
 	if (!usuario || !contrasena) {
   	Alert.alert('Faltan datos', 'Ingresa usuario y contraseña.');
   	return;
 	}
 
-	const existeUsuario = usuarios.find((u) => u.usuario === usuario);
+	try {
+  	const usuarios = await obtenerUsuarios();
 
-	if (existeUsuario) {
-  	Alert.alert('Usuario existente', 'Ese usuario ya existe.');
-  	return;
+  	const existeUsuario = usuarios.find(
+    	(item) => item.usuario.toLowerCase() === usuario.toLowerCase()
+  	);
+
+  	if (existeUsuario) {
+    	Alert.alert('Usuario existente', 'Ese usuario ya existe.');
+    	return;
+  	}
+
+  	const nuevoUsuario = {
+    	usuario,
+    	contrasena,
+  	};
+
+  	const nuevosUsuarios = [...usuarios, nuevoUsuario];
+
+  	await guardarUsuarios(nuevosUsuarios);
+  	await AsyncStorage.setItem('usuarioActual', usuario);
+
+  	setUsuarioActual(usuario);
+  	setUsuario('');
+  	setContrasena('');
+  	setPantalla('inicio');
+
+  	Alert.alert('Cuenta creada', 'Cuenta creada correctamente.');
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudo crear la cuenta.');
 	}
-
-	const nuevoUsuario = {
-  	usuario,
-  	contrasena,
-	};
-
-	setUsuarios([...usuarios, nuevoUsuario]);
-	setUsuarioActual(usuario);
-	setUsuario('');
-	setContrasena('');
-	setPantalla('inicio');
-
-	Alert.alert('Cuenta creada', 'Cuenta creada correctamente.');
   };
 
-  const iniciarSesion = () => {
+  const iniciarSesion = async () => {
 	if (!usuario || !contrasena) {
   	Alert.alert('Faltan datos', 'Ingresa usuario y contraseña.');
   	return;
 	}
 
-	const usuarioEncontrado = usuarios.find(
-  	(u) => u.usuario === usuario && u.contrasena === contrasena
-	);
+	try {
+  	const usuarios = await obtenerUsuarios();
 
-	if (!usuarioEncontrado) {
-  	Alert.alert('Error', 'Usuario o contraseña incorrectos.');
-  	return;
+  	const usuarioEncontrado = usuarios.find(
+    	(item) =>
+      	item.usuario.toLowerCase() === usuario.toLowerCase() &&
+      	item.contrasena === contrasena
+  	);
+
+  	if (!usuarioEncontrado) {
+    	Alert.alert('Error', 'Usuario o contraseña incorrectos.');
+    	return;
+  	}
+
+  	await AsyncStorage.setItem('usuarioActual', usuarioEncontrado.usuario);
+
+  	setUsuarioActual(usuarioEncontrado.usuario);
+  	setUsuario('');
+  	setContrasena('');
+  	setPantalla('inicio');
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudo iniciar sesión.');
 	}
-
-	setUsuarioActual(usuario);
-	setUsuario('');
-	setContrasena('');
-	setPantalla('inicio');
   };
 
-  const cerrarSesion = () => {
-	setUsuarioActual(null);
-	setPantalla('login');
+  const cerrarSesion = async () => {
+	try {
+  	await AsyncStorage.removeItem('usuarioActual');
+
+  	setUsuarioActual(null);
+  	setRegistros([]);
+  	setUsuario('');
+  	setContrasena('');
+  	setPantalla('login');
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudo cerrar sesión.');
+	}
   };
 
-  const guardarRegistro = () => {
+  const cargarRegistros = async (nombreUsuario) => {
+	try {
+  	const registrosGuardados = await AsyncStorage.getItem(
+    	`registros_${nombreUsuario}`
+  	);
+
+  	if (registrosGuardados) {
+    	setRegistros(JSON.parse(registrosGuardados));
+  	} else {
+    	setRegistros([]);
+  	}
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudieron cargar los registros.');
+	}
+  };
+
+  const guardarRegistros = async (nombreUsuario, nuevosRegistros) => {
+	try {
+  	await AsyncStorage.setItem(
+    	`registros_${nombreUsuario}`,
+    	JSON.stringify(nuevosRegistros)
+  	);
+	} catch (error) {
+  	Alert.alert('Error', 'No se pudieron guardar los registros.');
+	}
+  };
+
+  const guardarRegistro = async () => {
 	if (!kilometraje || !litros || !precio || !tipoCarga) {
   	Alert.alert('Faltan datos', 'Completa todos los campos.');
   	return;
@@ -89,7 +187,10 @@ export default function App() {
 	const precioNumero = Number(precio);
 
 	if (isNaN(kmNumero) || isNaN(litrosNumero) || isNaN(precioNumero)) {
-  	Alert.alert('Datos inválidos', 'Kilometraje, litros y precio deben ser números.');
+  	Alert.alert(
+    	'Datos inválidos',
+    	'Kilometraje, litros y precio deben ser números.'
+  	);
   	return;
 	}
 
@@ -112,7 +213,9 @@ export default function App() {
 
   	if (kmRecorridos > 0) {
     	consumoCalculado = kmRecorridos / litrosNumero;
-    	mensajeCalculo = `Consumo calculado: ${consumoCalculado.toFixed(2)} km/L`;
+    	mensajeCalculo = `Consumo calculado: ${consumoCalculado.toFixed(
+      	2
+    	)} km/L`;
   	} else {
     	mensajeCalculo =
       	'No se pudo calcular: el kilometraje debe ser mayor al registro anterior.';
@@ -145,7 +248,10 @@ export default function App() {
   	mensaje: mensajeCalculo,
 	};
 
-	setRegistros([nuevoRegistro, ...registros]);
+	const nuevosRegistros = [nuevoRegistro, ...registros];
+
+	setRegistros(nuevosRegistros);
+	await guardarRegistros(usuarioActual, nuevosRegistros);
 
 	setKilometraje('');
 	setLitros('');
@@ -154,6 +260,36 @@ export default function App() {
 	setPantalla('inicio');
 
 	Alert.alert('Registro guardado', mensajeCalculo);
+  };
+
+  const borrarDatosLocales = async () => {
+	Alert.alert(
+  	'Borrar datos',
+  	'Esto eliminará usuarios, sesión y registros guardados en este dispositivo.',
+  	[
+    	{
+      	text: 'Cancelar',
+      	style: 'cancel',
+    	},
+    	{
+      	text: 'Borrar',
+      	style: 'destructive',
+      	onPress: async () => {
+        	try {
+          	await AsyncStorage.clear();
+          	setUsuarioActual(null);
+          	setRegistros([]);
+          	setUsuario('');
+          	setContrasena('');
+          	setPantalla('login');
+          	Alert.alert('Listo', 'Datos locales eliminados.');
+        	} catch (error) {
+          	Alert.alert('Error', 'No se pudieron borrar los datos.');
+        	}
+      	},
+    	},
+  	]
+	);
   };
 
   if (pantalla === 'login') {
@@ -186,9 +322,13 @@ export default function App() {
       	<Text style={styles.secondaryButtonText}>Crear cuenta</Text>
     	</TouchableOpacity>
 
+    	<TouchableOpacity style={styles.dangerButton} onPress={borrarDatosLocales}>
+      	<Text style={styles.dangerButtonText}>Borrar datos locales</Text>
+    	</TouchableOpacity>
+
     	<View style={styles.infoBox}>
       	<Text style={styles.infoText}>
-        	Versión de prueba: los usuarios y registros se mantienen mientras la app esté abierta.
+        	Los usuarios y registros se guardan localmente en este dispositivo.
       	</Text>
     	</View>
   	</View>
@@ -322,7 +462,8 @@ export default function App() {
       	registros.map((registro) => (
         	<View key={registro.id} style={styles.historyCard}>
           	<Text style={styles.historyMain}>
-            	{registro.tipoCarga === 'Carga completa' ? '🟢' : '🟡'} {registro.tipoCarga}
+            	{registro.tipoCarga === 'Carga completa' ? '🟢' : '🟡'}{' '}
+            	{registro.tipoCarga}
           	</Text>
 
           	<Text style={styles.historyText}>Fecha: {registro.fecha}</Text>
@@ -443,6 +584,20 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
 	color: '#2563eb',
 	fontSize: 16,
+	fontWeight: 'bold',
+	textAlign: 'center',
+  },
+  dangerButton: {
+	backgroundColor: '#fee2e2',
+	padding: 14,
+	borderRadius: 14,
+	marginTop: 12,
+	borderWidth: 1,
+	borderColor: '#dc2626',
+  },
+  dangerButtonText: {
+	color: '#dc2626',
+	fontSize: 15,
 	fontWeight: 'bold',
 	textAlign: 'center',
   },
